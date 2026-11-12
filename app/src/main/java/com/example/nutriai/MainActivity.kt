@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         loginBtn = findViewById(R.id.login_btn)
         createAccountBtn = findViewById(R.id.crate_ac)
 
-        // LOGIN: valida y verifica contra la base de datos. No crea cuentas.
+        // LOGIN: valida, verifica contra la base de datos y, si coincide, navega a Dashboard.
         loginBtn.setOnClickListener {
             val username = usernameInput.text.toString().trim()
             val password = passwordInput.text.toString()
@@ -47,7 +47,9 @@ class MainActivity : AppCompatActivity() {
 
                 withContext(Dispatchers.Main) {
                     if (coincide) {
-                        Toast.makeText(this@MainActivity, "Bienvenido, $username", Toast.LENGTH_SHORT).show()
+                        val intent = Intent(this@MainActivity, Dashboard::class.java)
+                        intent.putExtra("usuario", username)
+                        startActivity(intent)
                     } else {
                         Toast.makeText(
                             this@MainActivity,
