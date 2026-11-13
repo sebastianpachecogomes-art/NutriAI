@@ -55,4 +55,14 @@ object Validadores {
         val n = aDouble(v) ?: return "Escribe un número"
         return if (n < 0.0 || n > 24.0) "Las horas deben estar entre 0 y 24" else null
     }
+
+    fun hora(v: String): String? {
+        val n = v.trim().toIntOrNull() ?: return "Escribe un número entero"
+        return if (n !in 0..23) "La hora debe estar entre 0 y 23" else null
+    }
+
+    fun minuto(v: String): String? {
+        val n = v.trim().toIntOrNull() ?: return "Escribe un número entero"
+        return if (n !in 0..59) "Los minutos deben estar entre 0 y 59" else null
+    }
 }

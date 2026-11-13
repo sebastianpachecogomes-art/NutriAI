@@ -63,3 +63,14 @@ La actividad pide Kotlin + **Jetpack Compose**, por lo que la capa de presentaci
 
 ## 7. Pendiente para el Sprint 2
 Sincronización con la API en Go (RF07), recordatorios (RF09), resumen de correlación (RF10), servicio de IA real (RF08), persistencia de sesión, migración real de Room y mover textos a `strings.xml`.
+
+## 8. Sprint 2 – Integración funcional
+Ver `CHANGELOG.md` (cambios) y `docs/EVIDENCIA_INTEGRACION.md` (integración entre módulos).
+
+| Decisión | Motivo |
+|---|---|
+| Sincronización simulada tras la interfaz `ServicioSincronizacion` | La API en Go aún no está disponible; el punto de sustitución queda documentado. |
+| Resumen calculado en el dispositivo (`AnalizadorBienestar`) | Equivale a la vista materializada del servidor y funciona sin conexión. |
+| Asistente local tras `ServicioIA` | Evita depender de un servicio externo y de sus cuotas. |
+| Alarma inexacta (`setInexactRepeating`) | No requiere el permiso de alarmas exactas; la hora puede variar unos minutos. |
+| IMC solo para adultos | En niños el IMC se interpreta con curvas OMS, que no están implementadas. |

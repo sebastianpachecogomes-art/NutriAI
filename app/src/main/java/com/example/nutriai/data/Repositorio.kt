@@ -1,5 +1,7 @@
 package com.example.nutriai.data
 
+import com.example.nutriai.servicios.ResultadoSync
+import com.example.nutriai.servicios.ServicioSincronizacion
 import com.example.nutriai.util.Seguridad
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -39,6 +41,19 @@ class Repositorio(private val db: DatosDatabase) {
 
     suspend fun guardarRegistro(registro: RegistroDiario): Long =
         withContext(Dispatchers.IO) { db.registroDao().addRegistro(registro) }
+
+    // ---------- Sincronización (RF07, Sprint 2) ----------
+    /** Envía al servicio los registros pendientes del usuario y marca como sincronizados los aceptados. */
+    suspend fun sincronizar(usuario: String, servicio: ServicioSincronizacion): ResultadoSync =
+        withContext(Dispatchers.IO) {
+            val pendientes = db.registroDao().pendientesDe(usuario)
+            if (pendientes.isEmpty()) return@withContext ResultadoSync.NadaPendiente
+            val resultado = servicio.enviar(pendientes)
+            if (resultado is ResultadoSync.Aceptado) {
+                resultado.ids.chunked(500).forEach { db.registroDao().marcarSincronizados(it) }
+            }
+            resultado
+        }
 
     // ---------- Datos de prueba (Sprint 1) ----------
     /** Si la base está vacía crea el usuario demo / demo123 con dos perfiles y una semana de registros. */

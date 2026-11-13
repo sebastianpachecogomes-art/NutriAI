@@ -12,8 +12,8 @@ android {
         applicationId = "com.example.nutriai"
         minSdk = 24
         targetSdk = 37
-        versionCode = 2
-        versionName = "0.1.0-sprint1"
+        versionCode = 3
+        versionName = "0.2.0-sprint2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -39,6 +39,7 @@ dependencies {
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)

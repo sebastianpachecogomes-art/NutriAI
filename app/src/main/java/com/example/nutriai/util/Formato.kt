@@ -12,3 +12,5 @@ fun formatearFechaCorta(millisUtc: Long): String =
     SimpleDateFormat("dd/MM", Locale("es", "CO")).format(Date(millisUtc))
 
 fun Double.unDecimal(): String = String.format(Locale.US, "%.1f", this)
+
+fun Double.dosDecimales(): String = String.format(Locale.US, "%.2f", this)

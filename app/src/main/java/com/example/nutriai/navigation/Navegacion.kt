@@ -29,12 +29,17 @@ import com.example.nutriai.ui.screens.CrearCuentaScreen
 import com.example.nutriai.ui.screens.LoginScreen
 import com.example.nutriai.ui.screens.NuevoPerfilScreen
 import com.example.nutriai.ui.screens.NuevoRegistroScreen
+import com.example.nutriai.ui.screens.RecordatorioScreen
+import com.example.nutriai.ui.screens.ResumenScreen
 import com.example.nutriai.ui.screens.PerfilDetalleScreen
 import com.example.nutriai.ui.screens.PerfilesScreen
 import com.example.nutriai.ui.viewmodel.AsistenteViewModel
 import com.example.nutriai.ui.viewmodel.AuthViewModel
 import com.example.nutriai.ui.viewmodel.PerfilesViewModel
+import com.example.nutriai.ui.viewmodel.RecordatorioViewModel
 import com.example.nutriai.ui.viewmodel.RegistroViewModel
+import com.example.nutriai.ui.viewmodel.ResumenViewModel
+import com.example.nutriai.ui.viewmodel.SincronizacionViewModel
 import com.example.nutriai.ui.viewmodel.VmFactory
 
 object Rutas {
@@ -46,9 +51,14 @@ object Rutas {
     const val NUEVO_PERFIL = "nuevo_perfil"
     const val PERFIL = "perfil/{perfilId}"
     const val NUEVO_REGISTRO = "nuevo_registro/{perfilId}"
+    const val RESUMEN = "resumen/{perfilId}"
+    const val ASISTENTE_PERFIL = "asistente/{perfilId}"
+    const val RECORDATORIO = "recordatorio"
 
     fun perfil(id: Int) = "perfil/$id"
     fun nuevoRegistro(id: Int) = "nuevo_registro/$id"
+    fun resumen(id: Int) = "resumen/$id"
+    fun asistentePerfil(id: Int) = "asistente/$id"
 
     val publicas = setOf(LOGIN, CREAR_CUENTA)
 }
@@ -87,7 +97,7 @@ private fun BarraInferior(nav: NavController, rutaActual: String) {
 @Composable
 fun NutriApp() {
     val nav = rememberNavController()
-    val fabrica = remember { VmFactory(DatosApplication.repositorio) }
+    val fabrica = remember { VmFactory(DatosApplication.contenedor) }
     val auth: AuthViewModel = viewModel(factory = fabrica)
     val usuario by auth.usuario.collectAsStateWithLifecycle()
     val estadoAuth by auth.estado.collectAsStateWithLifecycle()
@@ -144,9 +154,12 @@ fun NutriApp() {
         }
         composable(Rutas.AJUSTES) {
             val vm: PerfilesViewModel = viewModel(factory = fabrica)
+            val sync: SincronizacionViewModel = viewModel(factory = fabrica)
             AjustesScreen(
                 usuario = usuario.orEmpty(),
                 vm = vm,
+                sync = sync,
+                onAbrirRecordatorio = { nav.navigate(Rutas.RECORDATORIO) },
                 onCerrarSesion = auth::cerrarSesion,
                 barraInferior = { BarraInferior(nav, Rutas.AJUSTES) }
             )
@@ -165,7 +178,9 @@ fun NutriApp() {
                 perfilId = id,
                 vm = vm,
                 onAtras = { nav.popBackStack() },
-                onNuevoRegistro = { nav.navigate(Rutas.nuevoRegistro(id)) }
+                onNuevoRegistro = { nav.navigate(Rutas.nuevoRegistro(id)) },
+                onResumen = { nav.navigate(Rutas.resumen(id)) },
+                onAsistente = { nav.navigate(Rutas.asistentePerfil(id)) }
             )
         }
         composable(
@@ -175,6 +190,26 @@ fun NutriApp() {
             val id = entry.arguments?.getInt("perfilId") ?: 0
             val vm: RegistroViewModel = viewModel(factory = fabrica)
             NuevoRegistroScreen(perfilId = id, vm = vm, onAtras = { nav.popBackStack() })
+        }
+        composable(
+            route = Rutas.RESUMEN,
+            arguments = listOf(navArgument("perfilId") { type = NavType.IntType })
+        ) { entry ->
+            val id = entry.arguments?.getInt("perfilId") ?: 0
+            val vm: ResumenViewModel = viewModel(factory = fabrica)
+            ResumenScreen(perfilId = id, vm = vm, onAtras = { nav.popBackStack() })
+        }
+        composable(
+            route = Rutas.ASISTENTE_PERFIL,
+            arguments = listOf(navArgument("perfilId") { type = NavType.IntType })
+        ) { entry ->
+            val id = entry.arguments?.getInt("perfilId") ?: 0
+            val vm: AsistenteViewModel = viewModel(factory = fabrica)
+            AsistenteScreen(vm = vm, perfilId = id, onAtras = { nav.popBackStack() })
+        }
+        composable(Rutas.RECORDATORIO) {
+            val vm: RecordatorioViewModel = viewModel(factory = fabrica)
+            RecordatorioScreen(vm = vm, onAtras = { nav.popBackStack() })
         }
     }
 }

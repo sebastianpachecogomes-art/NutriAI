@@ -40,6 +40,15 @@ interface RegistroDao {
     )
     fun observarPendientes(usuario: String): Flow<Int>
 
+    @Query(
+        "SELECT r.* FROM registroEntity r INNER JOIN perfilEntity p ON r.perfilId = p.id " +
+            "WHERE p.usuarioPropietario = :usuario AND r.sincronizado = 0 ORDER BY r.fechaUtc ASC"
+    )
+    suspend fun pendientesDe(usuario: String): List<RegistroDiario>
+
+    @Query("UPDATE registroEntity SET sincronizado = 1 WHERE id IN (:ids)")
+    suspend fun marcarSincronizados(ids: List<Int>)
+
     @Insert
     suspend fun addRegistro(registro: RegistroDiario): Long
 }

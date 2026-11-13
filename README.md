@@ -14,8 +14,15 @@ App Android nativa en **Kotlin + Jetpack Compose** con persistencia local en **R
 - Datos de prueba: al primer arranque se crea el usuario **demo / demo123** con dos perfiles y 7 días de registros.
 - Asistente con respuestas locales de prueba y aviso médico-legal visible (no es IA real todavía).
 
-## Fuera del Sprint 1 (pendiente)
-Sincronización con el backend Go + PostgreSQL, recordatorios, resumen de correlación, servicio de IA real.
+## Sprint 2 (versión candidata 0.2.0)
+- Sincronización con servidor **simulado** (punto de sustitución: `ServicioSincronizacion`).
+- Resumen de bienestar con lógica de dominio (`domain/`).
+- Recordatorio diario con notificación.
+- Asistente con contexto del perfil (punto de sustitución: `ServicioIA`).
+Ver `CHANGELOG.md` y `docs/EVIDENCIA_INTEGRACION.md`.
+
+## Pendiente
+API real en Go + PostgreSQL, servicio de IA real, persistencia de sesión.
 
 ## Cómo ejecutar
 1. Abrir la carpeta en **Android Studio** (versión compatible con AGP 9.4.1) y esperar el *Gradle Sync*.
@@ -39,7 +46,10 @@ El archivo queda en `app/build/outputs/apk/debug/app-debug.apk`.
 ```
 app/src/main/java/com/example/nutriai/
   MainActivity.kt, DatosApplication.kt
+  Contenedor.kt inyección de dependencias (aquí se sustituyen los servicios simulados)
   data/        entidades Room, DAOs, base de datos y Repositorio
+  domain/      lógica de negocio: Estadistica, Hallazgo, AnalizadorBienestar
+  servicios/   sincronización simulada, asistente, recordatorios
   navigation/  rutas y NavHost (Navegacion.kt)
   ui/          theme, components, screens, viewmodel, estados (Carga, Guardado)
   util/        Validadores, Seguridad, Formato, RespuestasAsistente

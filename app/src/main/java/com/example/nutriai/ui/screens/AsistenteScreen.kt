@@ -36,7 +36,14 @@ import com.example.nutriai.ui.viewmodel.MensajeChat
 
 /** CU05 - Asistente (Sprint 1: respuestas locales de prueba, con aviso legal visible, RNF03). */
 @Composable
-fun AsistenteScreen(vm: AsistenteViewModel, barraInferior: @Composable () -> Unit) {
+fun AsistenteScreen(
+    vm: AsistenteViewModel,
+    perfilId: Int? = null,
+    onAtras: (() -> Unit)? = null,
+    barraInferior: @Composable () -> Unit = {}
+) {
+    val perfilContexto by vm.perfilContexto.collectAsStateWithLifecycle()
+    LaunchedEffect(perfilId) { vm.fijarPerfil(perfilId) }
     val mensajes by vm.mensajes.collectAsStateWithLifecycle()
     val escribiendo by vm.escribiendo.collectAsStateWithLifecycle()
     var texto by remember { mutableStateOf("") }
@@ -48,11 +55,18 @@ fun AsistenteScreen(vm: AsistenteViewModel, barraInferior: @Composable () -> Uni
     }
 
     Scaffold(
-        topBar = { BarraSuperior("Asistente") },
+        topBar = { BarraSuperior("Asistente", onAtras) },
         bottomBar = barraInferior
     ) { padding ->
         Column(modifier = Modifier.padding(padding).imePadding()) {
             AvisoLegal(modifier = Modifier.padding(12.dp))
+            if (perfilContexto != null) {
+                Text(
+                    "Contexto: resumen de $perfilContexto",
+                    style = MaterialTheme.typography.labelLarge,
+                    modifier = Modifier.padding(horizontal = 12.dp)
+                )
+            }
             LazyColumn(
                 state = estadoLista,
                 modifier = Modifier.weight(1f).padding(horizontal = 12.dp),
@@ -93,8 +107,11 @@ private fun Burbuja(m: MensajeChat) {
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = if (m.esUsuario) Alignment.CenterEnd else Alignment.CenterStart) {
         Surface(
             shape = MaterialTheme.shapes.medium,
-            color = if (m.esUsuario) MaterialTheme.colorScheme.primaryContainer
-            else MaterialTheme.colorScheme.surfaceVariant
+            color = when {
+                m.esError -> MaterialTheme.colorScheme.errorContainer
+                m.esUsuario -> MaterialTheme.colorScheme.primaryContainer
+                else -> MaterialTheme.colorScheme.surfaceVariant
+            }
         ) {
             Text(m.texto, modifier = Modifier.padding(12.dp), style = MaterialTheme.typography.bodyMedium)
         }

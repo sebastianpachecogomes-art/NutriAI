@@ -21,6 +21,13 @@ Usuario de prueba: `demo` / `demo123` (se crea solo en el primer arranque).
 | P14 | Ajustes | Abrir pestaña Ajustes | Muestra usuario y registros pendientes (suben tras P11) | ☐ |
 | P15 | Cerrar sesión | Ajustes → Cerrar sesión | Vuelve al login; el botón atrás no regresa a pantallas internas | ☐ |
 | P16 | Sin conexión | Activar modo avión y repetir P11 | Funciona igual (offline-first) | ☐ |
+| P17 | Resumen | Perfil «Demo Estudiante» → Ver resumen | Promedios ≈ 6.9 h / 3.6 / 3.7; r ≈ 0.95 y 0.96; hallazgos | ☐ |
+| P18 | Resumen con pocos registros | Perfil nuevo con 1 registro → Ver resumen | Mensaje «Se necesitan al menos 5 registros» | ☐ |
+| P19 | Asistente con contexto | Detalle → Preguntar al asistente → «sueño» | Respuesta con los promedios del perfil | ☐ |
+| P20 | Sincronizar sin conexión | Ajustes: interruptor ON → Sincronizar | Mensaje de error; pendientes sin cambio | ☐ |
+| P21 | Sincronizar con conexión | Interruptor OFF → Sincronizar | «Se sincronizaron N registros»; pendientes 0 | ☐ |
+| P22 | Recordatorio válido | Hora 20, minutos 0 → Guardar y activar | Estado activo; notificación a la hora (puede tardar: alarma inexacta) | ☐ |
+| P23 | Recordatorio inválido | Hora 25 | Error bajo el campo | ☐ |
 
 ## Capturas a tomar (guardar en `docs/capturas/`)
 1. `01_login.png` – pantalla de login
@@ -32,8 +39,13 @@ Usuario de prueba: `demo` / `demo123` (se crea solo en el primer arranque).
 7. `07_nuevo_registro_errores.png`
 8. `08_asistente.png` – con aviso legal
 9. `09_ajustes.png`
+10. `10_resumen.png`
+11. `11_asistente_contexto.png`
+12. `12_sincronizacion_error.png`
+13. `13_sincronizacion_exito.png`
+14. `14_recordatorio.png`
 
 En Android Studio: Running Devices ▸ icono de cámara; o `adb exec-out screencap -p > captura.png`.
 
 ## Pruebas unitarias
-`./gradlew testDebugUnitTest` – ejecuta `ValidadoresTest` (9 pruebas).
+`./gradlew testDebugUnitTest` – ejecuta `ValidadoresTest`, `AnalizadorBienestarTest` y `ServiciosSimuladosTest`.

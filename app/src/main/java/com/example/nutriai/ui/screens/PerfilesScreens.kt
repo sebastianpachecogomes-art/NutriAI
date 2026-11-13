@@ -19,6 +19,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -182,7 +183,9 @@ fun PerfilDetalleScreen(
     perfilId: Int,
     vm: PerfilesViewModel,
     onAtras: () -> Unit,
-    onNuevoRegistro: () -> Unit
+    onNuevoRegistro: () -> Unit,
+    onResumen: () -> Unit,
+    onAsistente: () -> Unit
 ) {
     var perfil by remember { mutableStateOf<Perfil?>(null) }
     LaunchedEffect(perfilId) { perfil = vm.perfil(perfilId) }
@@ -238,6 +241,12 @@ fun PerfilDetalleScreen(
                                         style = MaterialTheme.typography.bodySmall
                                     )
                                 }
+                            }
+                        }
+                        item {
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                                OutlinedButton(onClick = onResumen, modifier = Modifier.weight(1f)) { Text("Ver resumen") }
+                                OutlinedButton(onClick = onAsistente, modifier = Modifier.weight(1f)) { Text("Preguntar al asistente") }
                             }
                         }
                         item { Text("Historial (${registros.size})", style = MaterialTheme.typography.titleMedium) }
