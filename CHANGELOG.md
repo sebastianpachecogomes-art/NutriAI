@@ -1,5 +1,11 @@
 # Registro de cambios
 
+## [0.2.1-sprint2] – Restauración de la estética de NutriAI
+- Tema, componentes y pantallas rehechos con los colores, medidas y estructura de los layouts XML originales (ver `docs/ESTETICA_NUTRIAI.md`).
+- Login y crear cuenta: degradado verde, logo y campos con contorno blanco.
+- Pantallas internas: encabezado verde, campos grises, botones en píldora, avatar circular, accesos rápidos y barra inferior con emojis (4 pestañas; Recordatorios pasa a ser pestaña).
+- Solo tema claro. `FondoDegradado`, `EncabezadoVerde`, `BarraInferiorNutri`, `BotonPildora`, `TileAcceso`, `FilaPerfil`, `AvatarPerfil` son componentes nuevos.
+
 ## [0.2.0-sprint2] – Integración funcional (semana del 9 al 16 de noviembre de 2026)
 Rama: `sprint-2/integracion-funcional`
 

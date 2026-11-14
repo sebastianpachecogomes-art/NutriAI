@@ -8,31 +8,34 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.nutriai.ui.components.BarraSuperior
+import com.example.nutriai.ui.components.BotonPildora
 import com.example.nutriai.ui.components.BotonPrincipal
 import com.example.nutriai.ui.components.TarjetaItem
+import com.example.nutriai.ui.components.TituloSeccion
+import com.example.nutriai.ui.theme.ColoresNutri
 import com.example.nutriai.ui.viewmodel.EstadoSync
 import com.example.nutriai.ui.viewmodel.PerfilesViewModel
 import com.example.nutriai.ui.viewmodel.SincronizacionViewModel
 
-/** CU07 Ajustes + CU09 Sincronizar (servidor simulado) + acceso a CU06 Recordatorio. */
+/** CU07 Cuenta + CU09 Sincronizar (servidor simulado). */
 @Composable
 fun AjustesScreen(
     usuario: String,
     vm: PerfilesViewModel,
     sync: SincronizacionViewModel,
-    onAbrirRecordatorio: () -> Unit,
     onCerrarSesion: () -> Unit,
     barraInferior: @Composable () -> Unit
 ) {
@@ -43,8 +46,9 @@ fun AjustesScreen(
     val recibidos by sync.recibidosPorServidor.collectAsStateWithLifecycle()
 
     Scaffold(
-        topBar = { BarraSuperior("Ajustes") },
-        bottomBar = barraInferior
+        topBar = { BarraSuperior("Mi cuenta") },
+        bottomBar = barraInferior,
+        containerColor = Color.White
     ) { padding ->
         Column(
             modifier = Modifier.padding(padding).padding(16.dp).verticalScroll(rememberScrollState()),
@@ -52,7 +56,7 @@ fun AjustesScreen(
         ) {
             TarjetaItem(titulo = usuario, subtitulo = "Cuenta con sesión iniciada")
 
-            Text("Sincronización", style = MaterialTheme.typography.titleMedium)
+            TituloSeccion("Sincronización", tamano = 18)
             TarjetaItem(
                 titulo = "Pendientes de sincronizar",
                 subtitulo = "Registros guardados solo en este dispositivo",
@@ -68,8 +72,12 @@ fun AjustesScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Simular servidor sin conexión", modifier = Modifier.weight(1f))
-                Switch(checked = sinConexion, onCheckedChange = { sync.simularSinConexion(it) })
+                Text("Simular servidor sin conexión", color = ColoresNutri.TextoOscuro, modifier = Modifier.weight(1f))
+                Switch(
+                    checked = sinConexion,
+                    onCheckedChange = { sync.simularSinConexion(it) },
+                    colors = SwitchDefaults.colors(checkedTrackColor = ColoresNutri.Verde, checkedThumbColor = Color.White)
+                )
             }
             BotonPrincipal(
                 texto = "Sincronizar ahora",
@@ -78,25 +86,13 @@ fun AjustesScreen(
                 onClick = { sync.sincronizar(usuario) }
             )
             when (val e = estado) {
-                is EstadoSync.Exito -> Text(
-                    "Se sincronizaron ${e.cantidad} registros.",
-                    color = MaterialTheme.colorScheme.primary
-                )
-                is EstadoSync.Info -> Text(e.mensaje)
+                is EstadoSync.Exito -> Text("Se sincronizaron ${e.cantidad} registros.", color = ColoresNutri.Verde)
+                is EstadoSync.Info -> Text(e.mensaje, color = ColoresNutri.TextoMedio)
                 is EstadoSync.Error -> Text(e.mensaje, color = MaterialTheme.colorScheme.error)
                 else -> Unit
             }
 
-            Text("Recordatorios", style = MaterialTheme.typography.titleMedium)
-            TarjetaItem(
-                titulo = "Recordatorio diario",
-                subtitulo = "Aviso para completar el registro del día",
-                onClick = onAbrirRecordatorio
-            )
-
-            OutlinedButton(onClick = onCerrarSesion, modifier = Modifier.fillMaxWidth()) {
-                Text("Cerrar sesión")
-            }
+            BotonPildora("Cerrar sesión", onCerrarSesion, Modifier.fillMaxWidth())
         }
     }
 }

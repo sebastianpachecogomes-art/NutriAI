@@ -1,18 +1,9 @@
 package com.example.nutriai.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -23,6 +14,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.nutriai.DatosApplication
+import com.example.nutriai.ui.components.BarraInferiorNutri
+import com.example.nutriai.ui.components.ItemNav
 import com.example.nutriai.ui.screens.AjustesScreen
 import com.example.nutriai.ui.screens.AsistenteScreen
 import com.example.nutriai.ui.screens.CrearCuentaScreen
@@ -63,34 +56,27 @@ object Rutas {
     val publicas = setOf(LOGIN, CREAR_CUENTA)
 }
 
-private data class Pestana(val ruta: String, val etiqueta: String, val icono: ImageVector)
-
 private val pestanas = listOf(
-    Pestana(Rutas.PERFILES, "Perfiles", Icons.Filled.Person),
-    Pestana(Rutas.ASISTENTE, "Asistente", Icons.Filled.Face),
-    Pestana(Rutas.AJUSTES, "Ajustes", Icons.Filled.Settings)
+    ItemNav(Rutas.PERFILES, "👶", "Perfiles"),
+    ItemNav(Rutas.ASISTENTE, "💬", "Asistente"),
+    ItemNav(Rutas.RECORDATORIO, "🔔", "Recordatorios"),
+    ItemNav(Rutas.AJUSTES, "👤", "Cuenta")
 )
 
-/** Barra de navegación inferior (reutilizable en las 3 pantallas principales). */
+/** Navegación entre las 4 pestañas principales (barra inferior de NutriAI). */
+private fun irAPestana(nav: NavController, ruta: String) {
+    nav.navigate(ruta) {
+        popUpTo(Rutas.PERFILES) { saveState = true }
+        launchSingleTop = true
+        restoreState = true
+    }
+}
+
+/** Barra de navegación inferior (reutilizable en las pantallas principales). */
 @Composable
 private fun BarraInferior(nav: NavController, rutaActual: String) {
-    NavigationBar {
-        pestanas.forEach { p ->
-            NavigationBarItem(
-                selected = rutaActual == p.ruta,
-                onClick = {
-                    if (rutaActual != p.ruta) {
-                        nav.navigate(p.ruta) {
-                            popUpTo(Rutas.PERFILES) { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    }
-                },
-                icon = { Icon(p.icono, contentDescription = p.etiqueta) },
-                label = { Text(p.etiqueta) }
-            )
-        }
+    BarraInferiorNutri(pestanas, rutaActual) { destino ->
+        if (destino != rutaActual) irAPestana(nav, destino)
     }
 }
 
@@ -145,6 +131,8 @@ fun NutriApp() {
                 vm = vm,
                 onAbrirPerfil = { nav.navigate(Rutas.perfil(it)) },
                 onNuevoPerfil = { nav.navigate(Rutas.NUEVO_PERFIL) },
+                onAbrirRecordatorios = { irAPestana(nav, Rutas.RECORDATORIO) },
+                onEvaluacion = { nav.navigate(Rutas.resumen(it)) },
                 barraInferior = { BarraInferior(nav, Rutas.PERFILES) }
             )
         }
@@ -159,7 +147,6 @@ fun NutriApp() {
                 usuario = usuario.orEmpty(),
                 vm = vm,
                 sync = sync,
-                onAbrirRecordatorio = { nav.navigate(Rutas.RECORDATORIO) },
                 onCerrarSesion = auth::cerrarSesion,
                 barraInferior = { BarraInferior(nav, Rutas.AJUSTES) }
             )
@@ -209,7 +196,7 @@ fun NutriApp() {
         }
         composable(Rutas.RECORDATORIO) {
             val vm: RecordatorioViewModel = viewModel(factory = fabrica)
-            RecordatorioScreen(vm = vm, onAtras = { nav.popBackStack() })
+            RecordatorioScreen(vm = vm, barraInferior = { BarraInferior(nav, Rutas.RECORDATORIO) })
         }
     }
 }

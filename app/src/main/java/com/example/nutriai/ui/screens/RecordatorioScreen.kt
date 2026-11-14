@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -27,14 +27,16 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.nutriai.servicios.GestorRecordatorios
 import com.example.nutriai.ui.components.BarraSuperior
+import com.example.nutriai.ui.components.BotonPildora
 import com.example.nutriai.ui.components.BotonPrincipal
 import com.example.nutriai.ui.components.CampoTexto
+import com.example.nutriai.ui.theme.ColoresNutri
 import com.example.nutriai.ui.viewmodel.RecordatorioViewModel
 import com.example.nutriai.util.Validadores
 
 /** CU06 - Configurar recordatorio diario (RF09). */
 @Composable
-fun RecordatorioScreen(vm: RecordatorioViewModel, onAtras: () -> Unit) {
+fun RecordatorioScreen(vm: RecordatorioViewModel, barraInferior: @Composable () -> Unit) {
     val config by vm.config.collectAsStateWithLifecycle()
     val mensaje by vm.mensaje.collectAsStateWithLifecycle()
     val contexto = LocalContext.current
@@ -50,7 +52,11 @@ fun RecordatorioScreen(vm: RecordatorioViewModel, onAtras: () -> Unit) {
         )
     }
 
-    Scaffold(topBar = { BarraSuperior("Recordatorio diario", onAtras) }) { padding ->
+    Scaffold(
+        topBar = { BarraSuperior("Recordatorios") },
+        bottomBar = barraInferior,
+        containerColor = Color.White
+    ) { padding ->
         Column(
             modifier = Modifier.padding(padding).padding(16.dp).imePadding().verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -58,7 +64,8 @@ fun RecordatorioScreen(vm: RecordatorioViewModel, onAtras: () -> Unit) {
             Text(
                 if (config.activo) "Estado: activo a las %02d:%02d".format(config.hora, config.minuto)
                 else "Estado: desactivado",
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                color = ColoresNutri.TextoOscuro
             )
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 CampoTexto(
@@ -86,9 +93,7 @@ fun RecordatorioScreen(vm: RecordatorioViewModel, onAtras: () -> Unit) {
                 }
             )
             if (config.activo) {
-                OutlinedButton(onClick = { vm.desactivar() }, modifier = Modifier.padding(top = 4.dp)) {
-                    Text("Desactivar recordatorio")
-                }
+                BotonPildora("Desactivar recordatorio", { vm.desactivar() })
             }
             if (mensaje != null) Text(mensaje.orEmpty(), style = MaterialTheme.typography.bodyMedium)
             Text(

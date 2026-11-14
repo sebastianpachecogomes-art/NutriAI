@@ -59,3 +59,6 @@ docs/          bitácora de integración y guía de pruebas/capturas
 ## Documentación
 - `docs/BITACORA_INTEGRACION.md` – decisiones y cambios de la integración.
 - `docs/PRUEBAS_Y_CAPTURAS.md` – casos de prueba manuales y lista de capturas a tomar.
+
+## Estética
+La interfaz conserva el diseño de NutriAI. Ver `docs/ESTETICA_NUTRIAI.md`.

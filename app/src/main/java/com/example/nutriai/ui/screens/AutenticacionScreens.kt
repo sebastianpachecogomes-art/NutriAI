@@ -6,10 +6,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -17,14 +14,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import com.example.nutriai.ui.components.BotonPrincipal
-import com.example.nutriai.ui.components.CampoTexto
+import androidx.compose.ui.unit.sp
+import com.example.nutriai.ui.components.BotonAuth
+import com.example.nutriai.ui.components.CampoAuth
+import com.example.nutriai.ui.components.FondoDegradado
+import com.example.nutriai.ui.components.LogoYNombre
+import com.example.nutriai.ui.components.TextoEnlace
+import com.example.nutriai.ui.theme.ColoresNutri
 import com.example.nutriai.ui.viewmodel.AuthUiState
 import com.example.nutriai.util.Validadores
 
-/** CU01 - Iniciar sesión (RF01). */
+/** CU01 - Iniciar sesión (RF01). Mantiene el diseño de activity_main.xml de NutriAI. */
 @Composable
 fun LoginScreen(
     estado: AuthUiState,
@@ -36,54 +39,56 @@ fun LoginScreen(
     var clave by remember { mutableStateOf("") }
     var intentado by remember { mutableStateOf(false) }
 
-    Scaffold { padding ->
+    FondoDegradado {
         Column(
             modifier = Modifier
-                .padding(padding)
-                .padding(24.dp)
+                .padding(16.dp)
                 .imePadding()
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
+                .verticalScroll(rememberScrollState())
+                .align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("BitácoraVita", style = MaterialTheme.typography.headlineLarge, color = MaterialTheme.colorScheme.primary)
-            Text("Nutrición, sueño y ánimo en un solo registro", style = MaterialTheme.typography.bodyMedium)
-
-            CampoTexto(
+            LogoYNombre("BitácoraVita")
+            CampoAuth(
                 valor = usuario,
                 onCambio = { usuario = it; onLimpiarError() },
-                etiqueta = "Usuario",
+                pista = "Username",
+                modifier = Modifier.padding(top = 32.dp),
                 error = if (intentado && usuario.isBlank()) "Escribe tu usuario" else null
             )
-            CampoTexto(
+            CampoAuth(
                 valor = clave,
                 onCambio = { clave = it; onLimpiarError() },
-                etiqueta = "Contraseña",
+                pista = "Password",
+                modifier = Modifier.padding(top = 16.dp),
                 esContrasena = true,
                 imeAction = ImeAction.Done,
                 error = if (intentado && clave.isBlank()) "Escribe tu contraseña" else null
             )
             if (estado.error != null) {
-                Text(estado.error, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    estado.error,
+                    color = ColoresNutri.ErrorSobreOscuro,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(top = 12.dp)
+                )
             }
-            BotonPrincipal(
-                texto = "Iniciar sesión",
+            BotonAuth(
+                texto = "LOGIN",
                 cargando = estado.cargando,
+                modifier = Modifier.padding(top = 32.dp),
                 onClick = {
                     intentado = true
                     if (usuario.isNotBlank() && clave.isNotBlank()) onLogin(usuario, clave)
                 }
             )
-            TextButton(onClick = onIrCrearCuenta) { Text("¿No tienes cuenta? Regístrate") }
-            Text(
-                "Datos de prueba: usuario demo · contraseña demo123",
-                style = MaterialTheme.typography.bodySmall
-            )
+            TextoEnlace("Crear una cuenta", onIrCrearCuenta)
+            Text("Datos de prueba: demo · demo123", color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
         }
     }
 }
 
-/** CU01 (flujo alterno A3) - Crear cuenta. */
+/** CU01 (flujo alterno A3) - Crear cuenta. Mantiene el diseño de home_layout.xml de NutriAI. */
 @Composable
 fun CrearCuentaScreen(
     estado: AuthUiState,
@@ -96,33 +101,39 @@ fun CrearCuentaScreen(
     var confirmacion by remember { mutableStateOf("") }
     var intentado by remember { mutableStateOf(false) }
 
-    val errorUsuario = if (intentado) Validadores.usuario(usuario) else null
-    val errorClave = if (intentado) Validadores.contrasena(clave) else null
-    val errorConfirmacion = if (intentado) Validadores.confirmacion(clave, confirmacion) else null
-
-    Scaffold { padding ->
+    FondoDegradado {
         Column(
             modifier = Modifier
-                .padding(padding)
-                .padding(24.dp)
+                .padding(16.dp)
                 .imePadding()
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .verticalScroll(rememberScrollState())
+                .align(Alignment.Center),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Text("Crear cuenta", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary)
-            CampoTexto(usuario, { usuario = it; onLimpiarError() }, "Usuario", error = errorUsuario)
-            CampoTexto(clave, { clave = it; onLimpiarError() }, "Contraseña", error = errorClave, esContrasena = true)
-            CampoTexto(
-                confirmacion, { confirmacion = it; onLimpiarError() }, "Confirmar contraseña",
-                error = errorConfirmacion, esContrasena = true, imeAction = ImeAction.Done
+            LogoYNombre("BitácoraVita")
+            CampoAuth(
+                usuario, { usuario = it; onLimpiarError() }, "Username",
+                modifier = Modifier.padding(top = 32.dp),
+                error = if (intentado) Validadores.usuario(usuario) else null
+            )
+            CampoAuth(
+                clave, { clave = it; onLimpiarError() }, "Password",
+                modifier = Modifier.padding(top = 16.dp), esContrasena = true,
+                error = if (intentado) Validadores.contrasena(clave) else null
+            )
+            CampoAuth(
+                confirmacion, { confirmacion = it; onLimpiarError() }, "Confirm password",
+                modifier = Modifier.padding(top = 16.dp), esContrasena = true, imeAction = ImeAction.Done,
+                error = if (intentado) Validadores.confirmacion(clave, confirmacion) else null
             )
             if (estado.error != null) {
-                Text(estado.error, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
+                Text(estado.error, color = ColoresNutri.ErrorSobreOscuro, fontSize = 14.sp, modifier = Modifier.padding(top = 12.dp))
             }
-            BotonPrincipal(
-                texto = "Crear cuenta",
+            BotonAuth(
+                texto = "CREAR CUENTA",
                 cargando = estado.cargando,
+                modifier = Modifier.padding(top = 32.dp),
                 onClick = {
                     intentado = true
                     if (Validadores.usuario(usuario) == null &&
@@ -131,7 +142,7 @@ fun CrearCuentaScreen(
                     ) onCrear(usuario, clave)
                 }
             )
-            TextButton(onClick = onVolver) { Text("¿Ya tienes cuenta? Inicia sesión") }
+            TextoEnlace("¿Ya tienes una cuenta? Iniciar sesión", onVolver)
         }
     }
 }

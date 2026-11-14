@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.nutriai.domain.Hallazgo
@@ -25,6 +26,7 @@ import com.example.nutriai.ui.components.AvisoLegal
 import com.example.nutriai.ui.components.BarraSuperior
 import com.example.nutriai.ui.components.MensajeCentrado
 import com.example.nutriai.ui.components.PantallaCarga
+import com.example.nutriai.ui.theme.ColoresNutri
 import com.example.nutriai.ui.viewmodel.ResumenViewModel
 import com.example.nutriai.util.dosDecimales
 import com.example.nutriai.util.unDecimal
@@ -35,7 +37,7 @@ fun ResumenScreen(perfilId: Int, vm: ResumenViewModel, onAtras: () -> Unit) {
     val flujo = remember(perfilId) { vm.resumen(perfilId) }
     val carga by flujo.collectAsStateWithLifecycle(initialValue = Carga.Cargando)
 
-    Scaffold(topBar = { BarraSuperior("Resumen de bienestar", onAtras) }) { padding ->
+    Scaffold(topBar = { BarraSuperior("Resumen de bienestar", onAtras) }, containerColor = Color.White) { padding ->
         when (val c = carga) {
             Carga.Cargando -> PantallaCarga(Modifier.padding(padding))
             is Carga.Error -> MensajeCentrado("No se pudo calcular el resumen: ${c.mensaje}", Modifier.padding(padding))
@@ -103,7 +105,7 @@ private fun TarjetaHallazgo(h: Hallazgo) {
                 if (h.nivel == Nivel.ATENCION) "Atención" else "Información",
                 style = MaterialTheme.typography.labelLarge,
                 color = if (h.nivel == Nivel.ATENCION) MaterialTheme.colorScheme.error
-                else MaterialTheme.colorScheme.primary
+                else ColoresNutri.Verde
             )
             Text(h.mensaje, style = MaterialTheme.typography.bodyMedium)
         }
