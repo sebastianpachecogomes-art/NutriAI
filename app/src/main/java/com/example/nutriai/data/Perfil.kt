@@ -13,5 +13,6 @@ data class Perfil(
     val edad: Int,
     val esNino: Boolean,
     val usuarioPropietario: String,
+    val fotoPath: String? = null,
     @PrimaryKey(autoGenerate = true) val id: Int = 0
 )

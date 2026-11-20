@@ -50,7 +50,7 @@ sealed class Hallazgo {
     data class Imc(val valor: Double, val categoria: String) : Hallazgo() {
         override val nivel = if (categoria == "peso normal") Nivel.INFO else Nivel.ATENCION
         override val mensaje get() =
-            "Tu IMC es ${valor.f1()} (${categoria} según la clasificación general para adultos). Consulta a un profesional para interpretarlo."
+            "Tu IMC es ${valor.f1()} ($categoria según la clasificación general para adultos). Consulta a un profesional para interpretarlo."
     }
 
     data object NotaNino : Hallazgo() {

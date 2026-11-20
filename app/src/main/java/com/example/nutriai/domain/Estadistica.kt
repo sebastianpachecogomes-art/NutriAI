@@ -27,6 +27,6 @@ object Estadistica {
             sy += dy * dy
         }
         val denominador = sqrt(sx * sy)
-        return if (denominador == 0.0) null else numerador / denominador
+        return if (denominador == 0.0) null else (numerador / denominador).coerceIn(-1.0, 1.0)
     }
 }

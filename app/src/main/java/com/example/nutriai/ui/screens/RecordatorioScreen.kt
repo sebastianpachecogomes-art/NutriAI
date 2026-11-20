@@ -14,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,6 +45,11 @@ fun RecordatorioScreen(vm: RecordatorioViewModel, barraInferior: @Composable () 
     var hora by remember { mutableStateOf(config.hora.toString()) }
     var minuto by remember { mutableStateOf(config.minuto.toString()) }
     var intentado by remember { mutableStateOf(false) }
+
+    LaunchedEffect(config) {
+        hora = config.hora.toString()
+        minuto = config.minuto.toString()
+    }
 
     val lanzadorPermiso = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { concedido ->
         if (concedido) vm.activar(hora, minuto)

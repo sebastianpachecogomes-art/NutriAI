@@ -19,9 +19,7 @@ class AuthViewModel(private val repo: Repositorio) : ViewModel() {
     private val _estado = MutableStateFlow(AuthUiState())
     val estado: StateFlow<AuthUiState> = _estado.asStateFlow()
 
-    init {
-        viewModelScope.launch { repo.sembrarDatosDePrueba() }
-    }
+    private val sembrarJob = viewModelScope.launch { repo.sembrarDatosDePrueba() }
 
     fun iniciarSesion(usuario: String, contrasena: String) {
         val u = usuario.trim()
@@ -31,6 +29,7 @@ class AuthViewModel(private val repo: Repositorio) : ViewModel() {
         }
         viewModelScope.launch {
             _estado.value = AuthUiState(cargando = true)
+            sembrarJob.join()
             val ok = repo.autenticar(u, contrasena)
             if (ok) {
                 _estado.value = AuthUiState()
@@ -45,6 +44,7 @@ class AuthViewModel(private val repo: Repositorio) : ViewModel() {
         val u = usuario.trim()
         viewModelScope.launch {
             _estado.value = AuthUiState(cargando = true)
+            sembrarJob.join()
             val creada = repo.registrarCuenta(u, contrasena)
             if (creada) {
                 _estado.value = AuthUiState()

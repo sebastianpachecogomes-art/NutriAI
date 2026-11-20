@@ -34,6 +34,29 @@ class Repositorio(private val db: DatosDatabase) {
 
     suspend fun crearPerfil(perfil: Perfil): Long = withContext(Dispatchers.IO) { db.perfilDao().addPerfil(perfil) }
 
+    suspend fun crearPerfilConRegistroInicial(
+        perfil: Perfil,
+        pesoInicial: Double?,
+        tallaInicial: Double?
+    ): Long = withContext(Dispatchers.IO) {
+        val perfilId = db.perfilDao().addPerfil(perfil)
+        if (pesoInicial != null && pesoInicial > 0.0 && tallaInicial != null && tallaInicial > 0.0) {
+            db.registroDao().addRegistro(
+                RegistroDiario(
+                    perfilId = perfilId.toInt(),
+                    fechaUtc = System.currentTimeMillis(),
+                    peso = pesoInicial,
+                    talla = tallaInicial,
+                    comidas = "Registro inicial",
+                    horasSueno = if (perfil.esNino) 10.0 else 7.5,
+                    energia = 4,
+                    animo = 4
+                )
+            )
+        }
+        perfilId
+    }
+
     // ---------- Registros diarios (RF03-RF06) ----------
     fun registros(perfilId: Int): Flow<List<RegistroDiario>> = db.registroDao().observarPorPerfil(perfilId)
 
@@ -49,7 +72,7 @@ class Repositorio(private val db: DatosDatabase) {
             val pendientes = db.registroDao().pendientesDe(usuario)
             if (pendientes.isEmpty()) return@withContext ResultadoSync.NadaPendiente
             val resultado = servicio.enviar(pendientes)
-            if (resultado is ResultadoSync.Aceptado) {
+            if (resultado is ResultadoSync.Aceptado && resultado.ids.isNotEmpty()) {
                 resultado.ids.chunked(500).forEach { db.registroDao().marcarSincronizados(it) }
             }
             resultado

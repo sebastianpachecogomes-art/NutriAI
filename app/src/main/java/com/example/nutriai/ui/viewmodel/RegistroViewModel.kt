@@ -26,13 +26,18 @@ class RegistroViewModel(private val repo: Repositorio) : ViewModel() {
         energia: Int,
         animo: Int
     ) {
-        val p = Validadores.aDouble(peso)
-        val t = Validadores.aDouble(talla)
-        val h = Validadores.aDouble(horasSueno)
-        if (p == null || t == null || h == null) {
-            _guardado.value = Guardado.Error("Revisa los campos numéricos")
+        val errPeso = Validadores.peso(peso)
+        val errTalla = Validadores.talla(talla)
+        val errComidas = Validadores.comidas(comidas)
+        val errSueno = Validadores.horasSueno(horasSueno)
+        if (errPeso != null || errTalla != null || errComidas != null || errSueno != null) {
+            val err = errPeso ?: errTalla ?: errComidas ?: errSueno ?: "Revisa los campos"
+            _guardado.value = Guardado.Error(err)
             return
         }
+        val p = Validadores.aDouble(peso)!!
+        val t = Validadores.aDouble(talla)!!
+        val h = Validadores.aDouble(horasSueno)!!
         viewModelScope.launch {
             _guardado.value = Guardado.Guardando
             _guardado.value = try {

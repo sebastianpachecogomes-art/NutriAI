@@ -1,9 +1,11 @@
 package com.example.nutriai.ui.components
 
+import android.graphics.BitmapFactory
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,12 +46,15 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -240,6 +245,7 @@ fun CampoTexto(
     onCambio: (String) -> Unit,
     etiqueta: String,
     modifier: Modifier = Modifier,
+    pista: String? = null,
     error: String? = null,
     teclado: KeyboardType = KeyboardType.Text,
     esContrasena: Boolean = false,
@@ -251,6 +257,7 @@ fun CampoTexto(
         OutlinedTextField(
             value = valor,
             onValueChange = onCambio,
+            placeholder = if (pista != null) { { Text(pista) } } else null,
             isError = error != null,
             supportingText = if (error != null) {
                 { Text(error) }
@@ -344,29 +351,84 @@ fun BotonPildora(texto: String, onClick: () -> Unit, modifier: Modifier = Modifi
     }
 }
 
-/** Círculo verde con silueta blanca (circle_mask.xml + ic_person_placeholder.xml). */
+/** Círculo verde con foto o silueta blanca (circle_mask.xml + ic_person_placeholder.xml). */
 @Composable
-fun AvatarPerfil(tamano: Dp, modifier: Modifier = Modifier) {
+fun AvatarPerfil(tamano: Dp, modifier: Modifier = Modifier, fotoPath: String? = null) {
+    val bitmap = remember(fotoPath) {
+        if (!fotoPath.isNullOrBlank()) {
+            try {
+                BitmapFactory.decodeFile(fotoPath)?.asImageBitmap()
+            } catch (_: Exception) {
+                null
+            }
+        } else null
+    }
+
     Box(
         modifier = modifier.size(tamano).clip(CircleShape).background(ColoresNutri.Verde),
         contentAlignment = Alignment.Center
     ) {
-        Icon(Icons.Filled.Person, contentDescription = null, tint = Color.White, modifier = Modifier.size(tamano * 0.6f))
+        if (bitmap != null) {
+            Image(
+                bitmap = bitmap,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        } else {
+            Icon(Icons.Filled.Person, contentDescription = null, tint = Color.White, modifier = Modifier.size(tamano * 0.6f))
+        }
     }
 }
 
 /** Fila de lista de item_nino.xml: avatar de 48dp y nombre en negrita de 18sp. */
 @Composable
-fun FilaPerfil(nombre: String, detalle: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun FilaPerfil(
+    nombre: String,
+    detalle: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    fotoPath: String? = null
+) {
     Row(
         modifier = modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 4.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        AvatarPerfil(48.dp)
+        AvatarPerfil(48.dp, fotoPath = fotoPath)
         Column(modifier = Modifier.weight(1f).padding(start = 16.dp)) {
             Text(nombre, color = ColoresNutri.TextoOscuro, fontSize = 18.sp, fontWeight = FontWeight.Bold)
             Text(detalle, color = ColoresNutri.TextoClaro, fontSize = 13.sp)
         }
+    }
+}
+
+/** Botón de tarjeta con borde verde fino y fondo blanco, estilo icono/cuadrado (Detalles del niño). */
+@Composable
+fun BotonAccionCuadrado(
+    emoji: String,
+    etiqueta: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .border(1.dp, ColoresNutri.Verde.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+            .background(Color.White)
+            .clickable(onClick = onClick)
+            .padding(vertical = 12.dp, horizontal = 4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(emoji, fontSize = 22.sp)
+        Text(
+            etiqueta,
+            color = ColoresNutri.TextoOscuro,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.padding(top = 4.dp),
+            maxLines = 1
+        )
     }
 }
 
@@ -488,7 +550,7 @@ fun GraficaLinea(valores: List<Double>, modifier: Modifier = Modifier) {
     val colorEje = ColoresNutri.TextoClaro
     val minimo = valores.min()
     val maximo = valores.max()
-    val rango = if (maximo - minimo > 0.0) maximo - minimo else 1.0
+    val diferencia = maximo - minimo
 
     Canvas(modifier = modifier.fillMaxWidth().height(160.dp)) {
         val margen = 12.dp.toPx()
@@ -496,9 +558,10 @@ fun GraficaLinea(valores: List<Double>, modifier: Modifier = Modifier) {
         val alto = size.height - 2 * margen
         drawLine(colorEje, Offset(margen, size.height - margen), Offset(size.width - margen, size.height - margen), 2f)
         val puntos = valores.mapIndexed { i, v ->
+            val fraccion = if (diferencia > 0.0) ((v - minimo) / diferencia).toFloat() else 0.5f
             Offset(
                 margen + ancho * i / (valores.size - 1),
-                margen + alto * (1f - ((v - minimo) / rango).toFloat())
+                margen + alto * (1f - fraccion)
             )
         }
         for (i in 0 until puntos.size - 1) {

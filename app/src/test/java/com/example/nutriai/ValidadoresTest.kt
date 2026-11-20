@@ -58,6 +58,15 @@ class ValidadoresTest {
         assertNull(Validadores.comidas("arroz"))
     }
 
+    @Test fun nombre_perfil_y_horarios() {
+        assertNotNull(Validadores.nombrePerfil(""))
+        assertNull(Validadores.nombrePerfil("Sofía"))
+        assertNotNull(Validadores.hora("24"))
+        assertNull(Validadores.hora("20"))
+        assertNotNull(Validadores.minuto("60"))
+        assertNull(Validadores.minuto("30"))
+    }
+
     @Test fun hash_es_determinista_y_depende_de_la_sal() {
         assertEquals(Seguridad.hash("demo123", "s1"), Seguridad.hash("demo123", "s1"))
         assertNotEquals(Seguridad.hash("demo123", "s1"), Seguridad.hash("demo123", "s2"))

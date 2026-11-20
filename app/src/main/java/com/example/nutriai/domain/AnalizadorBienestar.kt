@@ -74,6 +74,7 @@ class AnalizadorBienestar(val minimoRegistros: Int = MINIMO_POR_DEFECTO) {
 
         /** Índice de masa corporal: peso (kg) / talla (m) al cuadrado. */
         fun imc(pesoKg: Double, tallaCm: Double): Double {
+            if (tallaCm <= 0.0) return 0.0
             val m = tallaCm / 100.0
             return pesoKg / (m * m)
         }

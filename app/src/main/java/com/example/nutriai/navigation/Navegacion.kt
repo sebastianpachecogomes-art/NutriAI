@@ -148,6 +148,8 @@ fun NutriApp() {
                 vm = vm,
                 sync = sync,
                 onCerrarSesion = auth::cerrarSesion,
+                onVolverAlPanel = { irAPestana(nav, Rutas.PERFILES) },
+                onAbrirPerfil = { nav.navigate(Rutas.perfil(it)) },
                 barraInferior = { BarraInferior(nav, Rutas.AJUSTES) }
             )
         }

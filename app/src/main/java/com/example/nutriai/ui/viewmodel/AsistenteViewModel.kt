@@ -13,6 +13,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
+import kotlinx.coroutines.Job
+
 data class MensajeChat(val texto: String, val esUsuario: Boolean, val esError: Boolean = false)
 
 /**
@@ -44,16 +46,19 @@ class AsistenteViewModel(
     val perfilContexto: StateFlow<String?> = _perfilContexto.asStateFlow()
 
     private var contexto: ResumenBienestar? = null
+    private var fijarJob: Job? = null
 
     fun fijarPerfil(perfilId: Int?) {
-        viewModelScope.launch {
+        fijarJob?.cancel()
+        fijarJob = viewModelScope.launch {
             if (perfilId == null) {
                 contexto = null
                 _perfilContexto.value = null
                 return@launch
             }
             val perfil = repo.perfil(perfilId)
-            contexto = perfil?.let { analizador.analizar(repo.registros(perfilId).first(), it.esNino) }
+            val lista = repo.registros(perfilId).first()
+            contexto = perfil?.let { analizador.analizar(lista, it.esNino) }
             _perfilContexto.value = perfil?.nombre
         }
     }
@@ -68,7 +73,7 @@ class AsistenteViewModel(
                 MensajeChat(ia.responder(consulta, contexto), esUsuario = false)
             } catch (e: CancellationException) {
                 throw e
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 MensajeChat("No pude obtener una respuesta en este momento. Inténtalo de nuevo.", false, esError = true)
             }
             _mensajes.value = _mensajes.value + respuesta
